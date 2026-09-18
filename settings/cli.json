@@ -1,0 +1,16 @@
+{
+  "chat.defaultModel": "claude-sonnet-4.6",
+  "chat.modelDefaults": {
+    "claude-opus-4.6": {
+      "output_config": {
+        "effort": "max"
+      }
+    },
+    "claude-sonnet-4.6": {
+      "output_config": {
+        "effort": "max"
+      }
+    }
+  },
+  "chat.enableAutoAgentUpgrade": true
+}

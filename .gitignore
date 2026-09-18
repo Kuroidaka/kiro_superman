@@ -1,0 +1,21 @@
+# Runtime sessions and logs (machine-specific, large)
+sessions/
+logs/
+session-index/
+
+# Downloaded/installed plugin artifacts (re-installable)
+vendor/
+plugins/
+skills/
+
+# Browser automation cache
+.playwright/
+.playwright-cli/
+
+# Backup files
+agents/*.bak
+**/*.bak
+
+# Sensitive auth credentials (if ever stored here)
+settings/auth.json
+settings/credentials.json

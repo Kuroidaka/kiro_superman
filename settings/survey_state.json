@@ -1,0 +1,16 @@
+{
+  "session-feedback": {
+    "eligible": true,
+    "sampledAtRate": 1,
+    "lastShownAt": 1789101538991,
+    "lastCompletedAt": null,
+    "dismissCount": 4
+  },
+  "plan-quality": {
+    "eligible": true,
+    "sampledAtRate": 0.1,
+    "lastShownAt": 1783498008784,
+    "lastCompletedAt": null,
+    "dismissCount": 0
+  }
+}
