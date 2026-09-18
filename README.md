@@ -42,21 +42,41 @@ Required by `ui-ux-pro-max`, `ui-styling`, and `design-system` skills.
 # Check
 python3 --version   # need 3.10+
 
-# Install (Ubuntu/Debian)
-sudo apt install python3
-
-# macOS
+# macOS (via Homebrew)
 brew install python3
+
+# Ubuntu/Debian
+sudo apt install python3
 ```
 
 ### Playwright CLI
-Required by the `playwright-cli` skill and the MCP playwright server.
+Required by the `playwright-cli` skill. Note: this is `@playwright/cli`, **not** `@playwright/mcp`.
 
 ```bash
-# Install globally
-npm install -g @playwright/mcp
+# Install globally (via nvm-managed node)
+npm install -g @playwright/cli
+```
 
-# Or run via npx (already configured in settings/mcp.json)
+The binary installs to your active nvm Node path (e.g. `~/.nvm/versions/node/v20.x.x/bin/`).
+If `playwright-cli --version` fails after install, nvm is not loaded in your current shell:
+
+```bash
+# Load nvm in current shell, then retry
+export NVM_DIR="$HOME/.nvm"
+source "$NVM_DIR/nvm.sh"
+playwright-cli --version   # should print version now
+```
+
+To make it permanent, ensure your `~/.zshrc` (macOS default) loads nvm:
+
+```bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+```
+
+The MCP playwright server is separate — it runs via npx and is already configured in `settings/mcp.json`:
+```bash
+# Already configured, no manual install needed
 npx @playwright/mcp@latest
 ```
 
@@ -142,7 +162,7 @@ export GOOGLE_API_KEY=your-key-here
 export GEMINI_API_KEY=your-key-here
 ```
 
-Add to `~/.bashrc` or `~/.zshrc` to persist.
+Add to `~/.zshrc` (macOS) or `~/.bashrc` (Linux) to persist.
 
 ---
 
@@ -197,4 +217,108 @@ ls ~/.kiro/vendor/superpowers/README.md
 # Skills
 ls ~/.agents/skills/
 ls ~/.kiro/skills/ponytail/
+```
+
+---
+
+## 7. Verify skills are runnable
+
+Run these checks after restoring to confirm each skill can actually execute on this machine.
+
+### playwright-cli
+
+```bash
+# Binary must be on PATH
+playwright-cli --version
+# If missing: npm install -g @playwright/cli
+```
+
+### ui-ux-pro-max
+
+Uses Python stdlib only — no pip packages needed.
+
+```bash
+python3 ~/.agents/skills/ui-ux-pro-max/scripts/search.py "button design" --max-results 1
+# Expected: JSON/text output with style results, no ImportError
+```
+
+### ui-styling
+
+Python scripts use stdlib only. The shadcn/ui CLI is invoked per-project (not global).
+
+```bash
+# Python check (used for tests)
+python3 -c "import csv, json, pathlib; print('ok')"
+
+# Node check (shadcn/ui runs via npx in your project)
+node --version   # needs 18+
+```
+
+### design-system
+
+Mix of Python and Node scripts. No third-party Python packages.
+
+```bash
+# Python scripts
+python3 ~/.agents/skills/design-system/scripts/search-slides.py "hero section" 2>&1 | head -5
+
+# Node scripts
+node ~/.agents/skills/design-system/scripts/generate-tokens.cjs --help 2>&1 | head -5
+```
+
+### design (logo / icon — Gemini AI required)
+
+Logo and icon generation require the `google-genai` Python package and a Gemini API key.
+
+```bash
+# Check package
+python3 -c "from google import genai; print('google-genai ok')" 2>/dev/null \
+  || echo "MISSING: pip install google-genai"
+
+# Check API key
+python3 -c "import os; print('key set' if os.environ.get('GEMINI_API_KEY') or os.environ.get('GOOGLE_API_KEY') else 'KEY MISSING')"
+
+# Install package if needed
+pip install google-genai
+```
+
+### brand
+
+Pure Node.js scripts, no external npm packages.
+
+```bash
+node ~/.agents/skills/brand/scripts/extract-colors.cjs --palette 2>&1 | head -5
+# Expected: palette output, no "Cannot find module" error
+```
+
+### slides / banner-design
+
+No scripts — reference-only skills. Verify the files exist:
+
+```bash
+ls ~/.agents/skills/slides/SKILL.md
+ls ~/.agents/skills/banner-design/SKILL.md
+```
+
+---
+
+### One-liner full check
+
+Paste this to get a pass/fail summary for all skills:
+
+```bash
+echo "=== Prerequisites ===" && \
+  node --version && python3 --version && \
+echo "=== playwright-cli ===" && \
+  (playwright-cli --version 2>/dev/null && echo "ok") || echo "MISSING" && \
+echo "=== ui-ux-pro-max ===" && \
+  python3 ~/.agents/skills/ui-ux-pro-max/scripts/search.py "test" --max-results 1 > /dev/null 2>&1 && echo "ok" || echo "FAIL" && \
+echo "=== google-genai (design) ===" && \
+  python3 -c "from google import genai" 2>/dev/null && echo "ok" || echo "MISSING: pip install google-genai" && \
+echo "=== GEMINI_API_KEY ===" && \
+  python3 -c "import os; sys.exit(0 if os.environ.get('GEMINI_API_KEY') or os.environ.get('GOOGLE_API_KEY') else 1)" 2>/dev/null && echo "set" || echo "NOT SET" && \
+echo "=== brand scripts ===" && \
+  node ~/.agents/skills/brand/scripts/extract-colors.cjs --palette > /dev/null 2>&1 && echo "ok" || echo "FAIL" && \
+echo "=== skill dirs ===" && \
+  ls ~/.agents/skills/ && ls ~/.kiro/skills/ponytail/
 ```
