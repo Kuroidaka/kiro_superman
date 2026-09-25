@@ -29,10 +29,10 @@
         "fetch_doc"
       ]
     },
-    "awslabs.aws-iac-mcp-server": {
+    "awslabs.cdk-mcp-server": {
       "command": "uvx",
       "args": [
-        "awslabs.aws-iac-mcp-server@latest"
+        "awslabs.cdk-mcp-server@latest"
       ],
       "env": {
         "FASTMCP_LOG_LEVEL": "ERROR"
@@ -44,13 +44,6 @@
       "args": [
         "-y",
         "react-docs-mcp"
-      ]
-    },   
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@playwright/mcp@latest"
       ]
     }
   }
